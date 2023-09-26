@@ -68,91 +68,123 @@
 </style>
 </head>
 <body>
-  <h1>CONTADOR/EDITOR DE TEXTO PARA TRADUZIR JOGOS</h1>
-  <p>- Para usar, copie um texto e cole na caixa, em seguida clique em processar texto.</p>
-  <p>- | Branco = Sem ação  |  Magenta = Falta completar os bytes  |  Verde = Contagem normal  |  Vermelho = Passou nº de bytes  |</p>
-  <p>- Para salvar, clique em "Salvar texto" e será gerado um novo arquivo em .txt.</p>
-  <p>- Desenvolvido por LOBO NINTENDISTA!</p>
+    <h1>CONTADOR/EDITOR DE TEXTO PARA TRADUZIR JOGOS</h1>
+    <p>- 1º copie um texto e cole na caixa, em seguida clique em processar texto.</p>
+   <p>
+  <b style="color: white;">- TEXTOS:  | Cor Branca = Não editado</b> |
+  <b style="color: magenta;">Cor Magenta = Falta completar os bytes</b> |
+  <b style="color: green;">Cor Verde = Texto pronto!</b>
+</p>
+    <p>- Revise o texto se está completo, antes de passar para a proxima linha!.</p>
+    <p>- Para salvar, clique em "Salvar texto" e será gerado um novo arquivo em .txt.</p>
+    <p>- Desenvolvido por LOBO NINTENDISTA!</p>
 
     <textarea id="textArea" placeholder="Cole seu texto aqui nesta caixa"></textarea>
-  <button onclick="processText()">Processar Texto</button>
-  <button onclick="saveText()">Salvar Texto</button>
-  <div class="output-container" id="output"></div>
+
+    <!-- Div para agrupar os botões -->
+    <div class="button-container">
+        <button onclick="confirmProcess()">Processar Texto</button>
+        <button onclick="saveText()">Salvar um novo arquivo</button>
+        <button onclick="confirmRestart()">REINICIAR PROGRAMA!!!</button>
+    </div>
+
+    <div class="output-container" id="output"></div>
 
 
 <script>
-  let modifiedLines = [];
+       let modifiedLines = [];
 
-  function processText() {
-    const textArea = document.getElementById('textArea');
-    const outputDiv = document.getElementById('output');
-    const lines = textArea.value.split('\n');
+        function processText() {
+            const textArea = document.getElementById('textArea');
+            const outputDiv = document.getElementById('output');
+            const lines = textArea.value.split('\n');
 
-    modifiedLines = [];
+            modifiedLines = [];
 
-    outputDiv.innerHTML = '';
+            outputDiv.innerHTML = '';
 
-    lines.forEach((line, index) => {
-      if (line.trim() !== '') {
-        const lineDiv = document.createElement('div');
-        lineDiv.className = 'line';
+            lines.forEach((line, index) => {
+                if (line.trim() !== '') {
+                    const lineDiv = document.createElement('div');
+                    lineDiv.className = 'line';
 
-        // Número da linha
-        const lineNumSpan = document.createElement('span');
-        lineNumSpan.className = 'line-number';
-        lineNumSpan.textContent = index + 1;
+                    // Número da linha
+                    const lineNumSpan = document.createElement('span');
+                    lineNumSpan.className = 'line-number';
+                    lineNumSpan.textContent = index + 1;
 
-        const charCountSpan = document.createElement('span');
-        charCountSpan.className = 'char-count';
-        charCountSpan.textContent = line.length;
+                    const charCountSpan = document.createElement('span');
+                    charCountSpan.className = 'char-count';
+                    charCountSpan.textContent = line.length;
 
-        const readOnlyInput = document.createElement('input');
-        readOnlyInput.type = 'text';
-        readOnlyInput.className = 'read-only-input';
-        readOnlyInput.value = line;
-        readOnlyInput.readOnly = true;
+                    const readOnlyInput = document.createElement('input');
+                    readOnlyInput.type = 'text';
+                    readOnlyInput.className = 'read-only-input';
+                    readOnlyInput.value = line;
+                    readOnlyInput.readOnly = true;
 
-        const editableInput = document.createElement('input');
-        editableInput.type = 'text';
-        editableInput.className = 'editable-input';
-        editableInput.value = line;
-        editableInput.addEventListener('input', (event) => {
-          modifiedLines[index] = event.target.value;
+                    const editableInput = document.createElement('input');
+                    editableInput.type = 'text';
+                    editableInput.className = 'editable-input';
+                    editableInput.value = line;
+                    editableInput.addEventListener('input', (event) => {
+                        const originalLine = lines[index];
+                        const currentLine = event.target.value;
 
-          const originalLine = lines[index];
-          const currentLine = event.target.value;
-          const charCount = currentLine.length;
+                        // Verifica se a quantidade de caracteres digitados excede o comprimento original
+                        if (currentLine.length > originalLine.length) {
+                            event.target.value = currentLine.slice(0, originalLine.length);
+                        }
 
-          const color = charCount > originalLine.length
-            ? 'red'
-            : charCount < originalLine.length
-            ? 'Magenta'
-            : 'Lime';
+                        modifiedLines[index] = event.target.value;
 
-          editableInput.style.color = color;
-          charCountSpan.textContent = charCount;
-        });
+                        const charCount = event.target.value.length;
 
-        lineDiv.appendChild(lineNumSpan);
-        lineDiv.appendChild(readOnlyInput);
-        lineDiv.appendChild(editableInput);
-        lineDiv.appendChild(charCountSpan); // Move char count element to the end
+                        const color = charCount > originalLine.length
+                            ? 'red'
+                            : charCount < originalLine.length
+                            ? 'magenta'
+                            : 'lime';
 
-        outputDiv.appendChild(lineDiv);
+                        event.target.style.color = color;
+                        charCountSpan.textContent = charCount;
+                    });
 
-        modifiedLines[index] = line;
-      }
-    });
-  }
+                    lineDiv.appendChild(lineNumSpan);
+                    lineDiv.appendChild(readOnlyInput);
+                    lineDiv.appendChild(editableInput);
+                    lineDiv.appendChild(charCountSpan); // Move char count element to the end
 
-  function saveText() {
-    const textToSave = modifiedLines.filter(Boolean).join('\n');
-    const blob = new Blob([textToSave], { type: 'text/plain' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'Novo_arquivo.txt';
-    a.click();
-  }
-</script>
+                    outputDiv.appendChild(lineDiv);
+
+                    modifiedLines[index] = line;
+                }
+            });
+        }
+
+        function saveText() {
+            const textToSave = modifiedLines.filter(Boolean).join('\n');
+            const blob = new Blob([textToSave], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'Novo_arquivo.txt';
+            a.click();
+        }
+
+        function confirmRestart() {
+            const confirmation = window.confirm('Tem certeza de que deseja reiniciar o programa? Todos os dados não salvos serão perdidos.');
+            if (confirmation) {
+                const textArea = document.getElementById('textArea');
+                textArea.value = '';
+                processText(); // Chama a função para atualizar a exibição
+            }
+        }
+		function confirmProcess() {
+            const confirmation = window.confirm('Deseja processar o texto?');
+            if (confirmation) {
+                processText(); // Chama a função de processamento de texto se o usuário confirmar
+            }
+        }
+    </script>
 </body>
 </html>
