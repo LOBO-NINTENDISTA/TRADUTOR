@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Editar Linhas de Texto</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Linhas de Texto</title>
 <style>
   body {
     background-color: black;
@@ -70,18 +70,17 @@
 <body>
     <h1>CONTADOR/EDITOR DE TEXTO PARA TRADUZIR JOGOS</h1>
     <p>- 1º copie um texto e cole na caixa, em seguida clique em processar texto.</p>
-   <p>
-  <b style="color: white;">- TEXTOS:  | Cor Branca = Não editado</b> |
-  <b style="color: magenta;">Cor Magenta = Falta completar os bytes</b> |
-  <b style="color: green;">Cor Verde = Texto pronto!</b>
-</p>
-    <p>- Revise o texto se está completo, antes de passar para a proxima linha!.</p>
+    <p>
+        <b style="color: white;">- TEXTOS: | Cor Branca = Não editado</b> |
+        <b style="color: magenta;">Cor Magenta = Falta completar os bytes</b> |
+        <b style="color: green;">Cor Verde = Texto pronto!</b>
+    </p>
+    <p>- Revise o texto se está completo, antes de passar para a próxima linha!.</p>
     <p>- Para salvar, clique em "Salvar texto" e será gerado um novo arquivo em .txt.</p>
     <p>- Desenvolvido por LOBO NINTENDISTA!</p>
 
     <textarea id="textArea" placeholder="Cole seu texto aqui nesta caixa"></textarea>
 
-    <!-- Div para agrupar os botões -->
     <div class="button-container">
         <button onclick="confirmProcess()">Processar Texto</button>
         <button onclick="saveText()">Salvar um novo arquivo</button>
@@ -90,9 +89,17 @@
 
     <div class="output-container" id="output"></div>
 
+    <script>
+        let modifiedLines = [];
 
-<script>
-       let modifiedLines = [];
+        // Carregar dados do armazenamento local se disponíveis
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedData = localStorage.getItem('modifiedLines');
+            if (savedData) {
+                modifiedLines = JSON.parse(savedData);
+                updateTextArea();
+            }
+        });
 
         function processText() {
             const textArea = document.getElementById('textArea');
@@ -131,7 +138,6 @@
                         const originalLine = lines[index];
                         const currentLine = event.target.value;
 
-                        // Verifica se a quantidade de caracteres digitados excede o comprimento original
                         if (currentLine.length > originalLine.length) {
                             event.target.value = currentLine.slice(0, originalLine.length);
                         }
@@ -153,13 +159,16 @@
                     lineDiv.appendChild(lineNumSpan);
                     lineDiv.appendChild(readOnlyInput);
                     lineDiv.appendChild(editableInput);
-                    lineDiv.appendChild(charCountSpan); // Move char count element to the end
+                    lineDiv.appendChild(charCountSpan);
 
                     outputDiv.appendChild(lineDiv);
 
                     modifiedLines[index] = line;
                 }
             });
+
+            // Atualize o armazenamento local com as linhas modificadas
+            localStorage.setItem('modifiedLines', JSON.stringify(modifiedLines));
         }
 
         function saveText() {
@@ -169,6 +178,9 @@
             a.href = URL.createObjectURL(blob);
             a.download = 'Novo_arquivo.txt';
             a.click();
+
+            // Atualize o armazenamento local com as linhas modificadas
+            localStorage.setItem('modifiedLines', JSON.stringify(modifiedLines));
         }
 
         function confirmRestart() {
@@ -176,15 +188,25 @@
             if (confirmation) {
                 const textArea = document.getElementById('textArea');
                 textArea.value = '';
-                processText(); // Chama a função para atualizar a exibição
+                processText();
+                // Remove os dados armazenados localmente ao reiniciar
+                localStorage.removeItem('modifiedLines');
             }
         }
-		function confirmProcess() {
+
+        function confirmProcess() {
             const confirmation = window.confirm('Deseja processar o texto?');
             if (confirmation) {
-                processText(); // Chama a função de processamento de texto se o usuário confirmar
+                processText();
             }
         }
+
+        function updateTextArea() {
+            const textArea = document.getElementById('textArea');
+            textArea.value = modifiedLines.filter(Boolean).join('\n');
+        }
+
+        window.addEventListener('load', updateTextArea);
     </script>
 </body>
 </html>
