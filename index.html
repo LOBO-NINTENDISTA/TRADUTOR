@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -205,6 +206,11 @@
             const textArea = document.getElementById('textArea');
             textArea.value = modifiedLines.filter(Boolean).join('\n');
         }
+
+        // Função para salvar automaticamente a cada 3 minutos
+        setInterval(function () {
+            saveText();
+        }, 180000); // 3 minutos em milissegundos
 
         window.addEventListener('load', updateTextArea);
     </script>
